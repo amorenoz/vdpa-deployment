@@ -3,7 +3,7 @@ GOBIN=${PWD}/bin
 # Default to build
 default: server client
 local: server client
-all: server-image vdpa-image sriov-dp httpd-init-image httpd-image vdpa-cni
+all: server-image vdpa-image vdpa-image-mlx sriov-dp httpd-init-image httpd-image vdpa-cni
 
 help:
 	@echo "Make Targets:"
@@ -14,6 +14,9 @@ help:
 	@echo "                         Plugin with vDPA changes integrated."
 	@echo " make vdpa-image       - Make the docker image that runs the DPDK vDPA sample"
 	@echo "                         APP. Manages the socketfiles for host."
+	@echo " make vdpa-image-mlx   - Make the docker image that runs the DPDK vDPA sample"
+	@echo "                         APP with Mellanox-specific drivers"
+	@echo "                         Manages the socketfiles for host."
 	@echo " make vdpa-cni         - Make the vDPA CNI binary. Binary needs to copied to"
 	@echo "                         proper location once complete (i.e. - /opt/cni/bin/.)."
 	@echo " make vdpa-cni-image   - Build the vDPA CNI in a docker image. When run as a"
@@ -127,6 +130,11 @@ vdpa-image:
 	@echo ""
 	@echo "Making vdpa-image ..."
 	@docker build --rm -t vdpa-daemonset -f ./vdpa-dpdk-image/Dockerfile .
+
+vdpa-image-mlx:
+	@echo ""
+	@echo "Making Mellanox vdpa-image ..."
+	@docker build --rm -t vdpa-daemonset -f ./vdpa-dpdk-image/mlx/Dockerfile .
 
 httpd-image:
 	@docker build --rm -t seastar-httpd -f ./seastar-httpd/httpd/Dockerfile .
