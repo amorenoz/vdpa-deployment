@@ -9,7 +9,7 @@ endif
 # Default to build
 default: server client
 local: server client
-all: server-image vdpa-image sriov-dp httpd-init-image httpd-image dpdk-app vdpa-cni
+all: server-image vdpa-image vdpa-image-mlx sriov-dp httpd-init-image httpd-image dpdk-app vdpa-cni
 
 help:
 	@echo "Make Targets:"
@@ -27,6 +27,10 @@ help:
 	@echo " make vdpa-image       - Make the docker image that runs the DPDK vDPA sample"
 	@echo "                         APP. Manages the socketfiles for host."
 	@echo "                         Append SCRATCH=y to build image using '--no-cache'."
+	@echo " make vdpa-image-mlx   - Make the docker image that runs the DPDK vDPA sample"
+	@echo "                         APP with Mellanox-specific drivers"
+	@echo "                         Append SCRATCH=y to build image using '--no-cache'."
+	@echo "                         Manages the socketfiles for host."
 	@echo " make vdpa-cni         - Make the vDPA CNI binary. Binary needs to copied to"
 	@echo "                         proper location once complete (i.e. - /opt/cni/bin/.)."
 	@echo "                         Append SCRATCH=y to re-download upstream repo."
@@ -149,6 +153,11 @@ vdpa-image:
 	@echo ""
 	@echo "Making vdpa-image $(NO_CACHE) ..."
 	@docker build $(NO_CACHE) --rm -t vdpa-daemonset -f ./vdpa-dpdk-image/Dockerfile .
+
+vdpa-image-mlx:
+	@echo ""
+	@echo "Making Mellanox vdpa-image $(NO_CACHE) ..."
+	@docker build $(NO_CACHE) --rm -t vdpa-daemonset-mlx -f ./vdpa-dpdk-image/mlx/Dockerfile .
 
 httpd-image:
 	@echo ""
