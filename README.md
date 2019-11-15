@@ -48,18 +48,18 @@ used and how this repo fits into the end solution:
 ![](doc/images/DPDKApp_In_Container_Using_vDPA.png)
 
 ## Quick Start
-To leverage this repo, download this repo, run `make all` and then copy
-the vDPA CNI to the proper location:
+To leverage this repo, download this repo, run `make intel` or `make mlx`
+depending on your setup and then copy the vDPA CNI to the proper location:
 
 ```
    cd $GOPATH/src/
    go get github.com/redhat-nfvpe/vdpa-deployment
    cd github.com/redhat-nfvpe/vdpa-deployment/
-   make all
+   make intel # or make mlx
    sudo cp bin/vdpa /opt/cni/bin/.
 ```
 
-`make all` builds the following images/binaries:
+`make intel` builds the following images/binaries:
 * `vdpa-daemonset` docker image: Located in the
   **vdpa-dpdk-image** directory. This image runs as a Daemonset on each node
   and manages the virtio unix socketfiles used by the virtio control channel.
@@ -76,6 +76,9 @@ the vDPA CNI to the proper location:
 * `vdpa` CNI binary: Located in the **vdpa-cni** directory. The binary is
   located in `bin/vdpa`. This file must be copied to the default CNI directory,
   typically `/opt/cni/bin/`. See [vdpa-cni](#vdpa-cni).
+
+`make mlx` builds the same images as `make intel` but uses mellanox vdpa drivers
+instead.
 
 The sample application used in this deployment is the `dpdk-app-centos`
 docker image. The following set of commands will download and build the image.

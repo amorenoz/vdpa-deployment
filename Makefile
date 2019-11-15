@@ -3,7 +3,8 @@ GOBIN=${PWD}/bin
 # Default to build
 default: server client
 local: server client
-all: server-image vdpa-image vdpa-image-mlx sriov-dp httpd-init-image httpd-image vdpa-cni
+intel: server-image vdpa-image sriov-dp httpd-init-image httpd-image vdpa-cni
+mlx: server-image vdpa-image-mlx sriov-dp httpd-init-image httpd-image vdpa-cni
 
 help:
 	@echo "Make Targets:"
