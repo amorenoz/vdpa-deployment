@@ -59,7 +59,7 @@ the vDPA CNI to the proper location:
    sudo cp bin/vdpa /opt/cni/bin/.
 ```
 
-`make all` builds the following images/binaries:
+`make intel` builds the following images/binaries:
 * `vdpa-daemonset` docker image: Located in the
   **vdpa-dpdk-image** directory. This image runs as a Daemonset on each node
   and manages the virtio unix socketfiles used by the virtio control channel.
@@ -158,6 +158,19 @@ application from DPDK. The `entrypoint.sh` script waits for a the set
 of PCI Addresses of the vDPA VFs to be written to the file 
 `/var/run/vdpa/pciList.dat`, which is provided by the SR-IOV Device
 Plugin (see [sriov-dp](#sriov-dp)).
+The **vdpa-dpdk-image/mlx** directory contains the files to build the Mellanox
+`vdpa-daemonset`. In order to select it, run `make vdpa-image-mlx` and
+modify the **deployment/vdpa-daemonset.yaml** to use the Mellanox image:
+
+```
+...
+      containers:
+      - name: vdpadpdk-daemonset
+        image: vdpa-daemonset-mlx
+        imagePullPolicy: Never
+        startupProbe:
+...
+```
 
 The `entrypoint.sh` script then reads this file and passes the set of
 PCI Address associated with the vDPA VF to the vDPA sample application.

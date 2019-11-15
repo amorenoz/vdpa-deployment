@@ -24,7 +24,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: vdpadpdk-daemonset
-        image: vdpa-daemonset
+        image: vdpa-daemonset-mlx
         imagePullPolicy: Never
         startupProbe:
           failureThreshold: 30

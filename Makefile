@@ -9,8 +9,7 @@ endif
 # Default to build
 default: server client
 local: server client
-<<<<<<< HEAD
-all: server-image vdpa-image-mlx vdpa-image-mlx sriov-dp httpd-init-image httpd-image dpdk-app vdpa-cni
+all: server-image vdpa-image vdpa-image-mlx sriov-dp httpd-init-image httpd-image dpdk-app vdpa-cni
 
 help:
 	@echo "Make Targets:"
@@ -158,7 +157,7 @@ vdpa-image:
 vdpa-image-mlx:
 	@echo ""
 	@echo "Making Mellanox vdpa-image $(NO_CACHE) ..."
-	@docker build $(NO_CACHE) --rm -t vdpa-daemonset -f ./vdpa-dpdk-image/mlx/Dockerfile .
+	@docker build $(NO_CACHE) --rm -t vdpa-daemonset-mlx -f ./vdpa-dpdk-image/mlx/Dockerfile .
 
 httpd-image:
 	@echo ""
