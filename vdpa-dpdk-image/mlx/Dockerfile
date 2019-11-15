@@ -73,6 +73,11 @@ RUN cp build/vdpa /usr/bin/vdpa
 FROM centos
 COPY --from=0 /usr/bin/vdpa /usr/bin/vdpa
 COPY --from=0 /usr/lib64/libnuma.so.1 /usr/lib64/libnuma.so.1
+COPY --from=0 /usr/lib64/libnl-3.so.200 /usr/lib64/libnl-3.so.200
+COPY --from=0 /usr/lib64/libnl-route-3.so.200 /usr/lib64/libnl-route-3.so.200
+COPY --from=0 /usr/src/rdma-core-stable-v25/build/lib/libibverbs.so.1 /usr/lib64/libibverbs.so.1
+COPY --from=0 /usr/src/rdma-core-stable-v25/build/lib/libmlx4.so.1 /usr/lib64/libmlx4.so.1
+COPY --from=0 /usr/src/rdma-core-stable-v25/build/lib/libmlx5.so.1 /usr/lib64/libmlx5.so.1
 # END - Docker 17.05 or higher
 
 LABEL io.k8s.display-name="vDPA Daemonset"
