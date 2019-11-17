@@ -8,29 +8,32 @@ data:
     {
         "resourceList": [{
                 "resourceName": "vdpa_dpdk_a",
+                "isRdma": true,
                 "selectors": {
-                    "vendors": ["1af4"],
-                    "devices": ["1041"],
-                    "drivers": ["vfio-pci"],
-                    "pfNames": ["enp131s0f0#0-1"]
+                    "vendors": ["15b3"],
+                    "devices": ["a2d2", "a2d3"],
+                    "drivers": ["mlx5_core"],
+                    "pfNames": ["enp66s0f0#0-0"]
                 }
             },
             {
                 "resourceName": "vdpa_dpdk_b",
+                "isRdma": true,
                 "selectors": {
-                    "vendors": ["1af4"],
-                    "devices": ["1041"],
-                    "drivers": ["vfio-pci"],
-                    "pfNames": ["enp131s0f0#2-3"]
+                    "vendors": ["15b3"],
+                    "devices": ["a2d2", "a2d3"],
+                    "drivers": ["mlx5_core"],
+                    "pfNames": ["enp66s0f0#1-1"]
                 }
             },
             {
                 "resourceName": "vdpa_dpdk_c",
+                "isRdma": true,
                 "selectors": {
-                    "vendors": ["1af4"],
-                    "devices": ["1041"],
-                    "drivers": ["vfio-pci"],
-                    "pfNames": ["enp131s0f0#7-7"]
+                    "vendors": ["15b3"],
+                    "devices": ["a2d2", "a2d3"],
+                    "drivers": ["mlx5_core"],
+                    "pfNames": ["enp66s0f0#2-2"]
                 }
             }
         ]
