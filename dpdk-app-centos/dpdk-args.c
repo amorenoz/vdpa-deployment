@@ -324,13 +324,15 @@ char** GetArgs(int *pArgc, eDpdkAppType appType)
 		 */
 		strncpy(&myArgsArray[argc++][0], "dpdk-app", DPDK_ARGS_MAX_ARG_STRLEN-1);
 
-		//strncpy(&myArgsArray[argc++][0], "-m", DPDK_ARGS_MAX_ARG_STRLEN-1);
-		//strncpy(&myArgsArray[argc++][0], "1024", DPDK_ARGS_MAX_ARG_STRLEN-1);
+		strncpy(&myArgsArray[argc++][0], "-m", DPDK_ARGS_MAX_ARG_STRLEN-1);
+		strncpy(&myArgsArray[argc++][0], "1024,1024", DPDK_ARGS_MAX_ARG_STRLEN-1);
 
-		strncpy(&myArgsArray[argc++][0], "-n", DPDK_ARGS_MAX_ARG_STRLEN-1);
-		strncpy(&myArgsArray[argc++][0], "4", DPDK_ARGS_MAX_ARG_STRLEN-1);
+		//strncpy(&myArgsArray[argc++][0], "-n", DPDK_ARGS_MAX_ARG_STRLEN-1);
+		//strncpy(&myArgsArray[argc++][0], "4", DPDK_ARGS_MAX_ARG_STRLEN-1);
 
-		//strncpy(&myArgsArray[argc++][0], "--file-prefix=dpdk-app_", DPDK_ARGS_MAX_ARG_STRLEN-1);
+		strncpy(&myArgsArray[argc++][0], "--single-file-segments", DPDK_ARGS_MAX_ARG_STRLEN-1);
+
+		strncpy(&myArgsArray[argc++][0], "--file-prefix=dpdk-app_", DPDK_ARGS_MAX_ARG_STRLEN-1);
 
 		if (appType == DPDK_APP_TESTPMD) {
 			strncpy(&myArgsArray[argc++][0], "-l", DPDK_ARGS_MAX_ARG_STRLEN-1);
@@ -424,6 +426,8 @@ char** GetArgs(int *pArgc, eDpdkAppType appType)
 			/* Set to use software to analyze packet type. Without this option, */
 			/* hardware will check the packet type. Not sure if vHost supports. */
 			strncpy(&myArgsArray[argc++][0], "--parse-ptype", DPDK_ARGS_MAX_ARG_STRLEN-1);
+		//	strncpy(&myArgsArray[argc++][0], "--eth-dest \"0,00:e8:ca:11:cc:01\"", DPDK_ARGS_MAX_ARG_STRLEN-1);
+		//	strncpy(&myArgsArray[argc++][0], "--eth-dest \"1,00:e8:ca:11:cc:02\"", DPDK_ARGS_MAX_ARG_STRLEN-1);
 
 		}
 		else if (appType == DPDK_APP_L2FWD) {
