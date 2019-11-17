@@ -98,7 +98,7 @@ The following set of commands will deploy the images above.
    kubectl create -f ./deployment/netAttach-vdpa-dpdk-b.yaml
    kubectl create -f ./deployment/configMap-vdpa.yaml
    kubectl create -f ./deployment/sriovdp-vdpa-daemonset.yaml
-   kubectl get node nfvsdn-22-oot -o json | jq '.status.allocatable'
+   kubectl get node $HOSTNAME -o json | jq '.status.allocatable'
 
    kubectl create -f ./deployment/vdpa-pod-1.yaml
 ```
@@ -161,6 +161,19 @@ application from DPDK. The `entrypoint.sh` script waits for a the set
 of PCI Addresses of the vDPA VFs to be written to the file 
 `/var/run/vdpa/pciList.dat`, which is provided by the SR-IOV Device
 Plugin (see [sriov-dp](#sriov-dp)).
+The **vdpa-dpdk-image/mlx** directory contains the files to build the Mellanox
+`vdpa-daemonset`. In order to select it, run `make vdpa-image-mlx` and
+modify the **deployment/vdpa-daemonset.yaml** to use the Mellanox image:
+
+```
+...
+      containers:
+      - name: vdpadpdk-daemonset
+        image: vdpa-daemonset-mlx
+        imagePullPolicy: Never
+        startupProbe:
+...
+```
 
 The `entrypoint.sh` script then reads this file and passes the set of
 PCI Address associated with the vDPA VF to the vDPA sample application.
@@ -519,7 +532,7 @@ determine the number of detected VFs. (NOTE: This is the allocated
 values and does not change as VFs are doled out.) See
 "intel.com/vdpa_dpdk_a" and "intel.com/vdpa_dpdk_b":
 ```
-kubectl get node nfvsdn-22-oot -o json | jq '.status.allocatable'
+kubectl get node $HOSTNAME -o json | jq '.status.allocatable'
 {
   "cpu": "64",
   "ephemeral-storage": "396858657750",
@@ -812,6 +825,8 @@ The following image can be retrieved:
    docker pull bmcfall/sriov-device-plugin:latest
    docker pull bmcfall/vdpa-daemonset:latest
    docker pull bmcfall/vdpa-grpc-server:latest
+   docker pull bmcfall/httpd-init-container:latest
+   docker pull bmcfall/seastar-httpd:latest
 ```
 
 ## Archive
