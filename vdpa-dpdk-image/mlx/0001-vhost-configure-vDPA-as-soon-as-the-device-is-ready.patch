@@ -1,0 +1,36 @@
+From 7efa2e9ffd8309ad7d49dec750eaebf61ecae819 Mon Sep 17 00:00:00 2001
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Date: Thu, 29 Aug 2019 09:59:47 +0200
+Subject: [PATCH 1/2] vhost: configure vDPA as soon as the device is ready
+
+There might not have any VHOST_USER_SET_VRING_CALL requests
+sent once virtio device is ready. When it happens, the vDPA
+device's dev_conf() callback may never be called.
+
+Fixes: 9f9014512822 ("vhost: configure vDPA device after set vring call message")
+Cc: stable@dpdk.org
+Cc: xiaolong.ye@intel.com
+
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Reviewed-by: Xiaolong Ye <xiaolong.ye@intel.com>
+---
+ lib/librte_vhost/vhost_user.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/lib/librte_vhost/vhost_user.c b/lib/librte_vhost/vhost_user.c
+index 0b72648..b1ea80c 100644
+--- a/lib/librte_vhost/vhost_user.c
++++ b/lib/librte_vhost/vhost_user.c
+@@ -2112,8 +2112,7 @@ skip_to_post_handle:
+ 	did = dev->vdpa_dev_id;
+ 	vdpa_dev = rte_vdpa_get_device(did);
+ 	if (vdpa_dev && virtio_is_ready(dev) &&
+-			!(dev->flags & VIRTIO_DEV_VDPA_CONFIGURED) &&
+-			msg.request.master == VHOST_USER_SET_VRING_CALL) {
++			!(dev->flags & VIRTIO_DEV_VDPA_CONFIGURED)) {
+ 		if (vdpa_dev->ops->dev_conf)
+ 			vdpa_dev->ops->dev_conf(dev->vid);
+ 		dev->flags |= VIRTIO_DEV_VDPA_CONFIGURED;
+-- 
+2.21.0
+

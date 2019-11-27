@@ -1,0 +1,43 @@
+From 84034a839782ca830853057b3675c40f978e2250 Mon Sep 17 00:00:00 2001
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Date: Thu, 31 Oct 2019 17:24:19 +0100
+Subject: [PATCH 2/2] vhost: add support for memory hotplug with vDPA device
+
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+---
+ lib/librte_vhost/vhost_user.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/lib/librte_vhost/vhost_user.c b/lib/librte_vhost/vhost_user.c
+index b1ea80c..55b20f3 100644
+--- a/lib/librte_vhost/vhost_user.c
++++ b/lib/librte_vhost/vhost_user.c
+@@ -2003,6 +2003,16 @@ vhost_user_msg_handler(int vid, int fd)
+ 
+ 	}
+ 
++	did = dev->vdpa_dev_id;
++	vdpa_dev = rte_vdpa_get_device(did);
++
++	if (vdpa_dev &&  (dev->flags & VIRTIO_DEV_VDPA_CONFIGURED) &&
++			msg.request.master == VHOST_USER_SET_MEM_TABLE) {
++		if (vdpa_dev->ops->dev_close)
++			vdpa_dev->ops->dev_close(dev->vid);
++		dev->flags &= ~VIRTIO_DEV_VDPA_CONFIGURED;
++	}
++
+ 	handled = false;
+ 	if (dev->extern_ops.pre_msg_handle) {
+ 		ret = (*dev->extern_ops.pre_msg_handle)(dev->vid,
+@@ -2109,8 +2119,6 @@ skip_to_post_handle:
+ 		}
+ 	}
+ 
+-	did = dev->vdpa_dev_id;
+-	vdpa_dev = rte_vdpa_get_device(did);
+ 	if (vdpa_dev && virtio_is_ready(dev) &&
+ 			!(dev->flags & VIRTIO_DEV_VDPA_CONFIGURED)) {
+ 		if (vdpa_dev->ops->dev_conf)
+-- 
+2.21.0
+

@@ -35,10 +35,12 @@ RUN wget http://file.mad.redhat.com/~amorenoz/vdpaDriver.tar.gz
 RUN tar -xpvf vdpaDriver.tar.gz
 
 WORKDIR ${DPDK_DIR}
-ADD vdpa-dpdk-image/mlx/0001-vdpa_hack-revert-configure-vdpa-device-on-vring-call.patch ${DPDK_DIR}
 ADD vdpa-dpdk-image/mlx/0002-mlx5-fix-debug-compilation.patch ${DPDK_DIR}
-RUN patch -p1 < 0001-vdpa_hack-revert-configure-vdpa-device-on-vring-call.patch
+ADD vdpa-dpdk-image/mlx/0001-vhost-configure-vDPA-as-soon-as-the-device-is-ready.patch ${DPDK_DIR}
+ADD vdpa-dpdk-image/mlx/0002-vhost-add-support-for-memory-hotplug-with-vDPA-devic.patch ${DPDK_DIR}
 RUN patch -p1 < 0002-mlx5-fix-debug-compilation.patch
+RUN patch -p1 < 0001-vhost-configure-vDPA-as-soon-as-the-device-is-ready.patch
+RUN patch -p1 < 0002-vhost-add-support-for-memory-hotplug-with-vDPA-devic.patch
 
 ENV RTE_TARGET=x86_64-native-linuxapp-gcc
 ENV RTE_SDK=${DPDK_DIR}
