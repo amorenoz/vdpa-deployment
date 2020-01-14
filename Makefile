@@ -153,7 +153,7 @@ vdpa-image:
 httpd-image:
 	@echo ""
 	@echo "Making httpd-image $(NO_CACHE) ..."
-	@docker build $(NO_CACHE) --rm -t seastar-httpd -f ./seastar-httpd/httpd/Dockerfile .
+	@docker build $(NO_CACHE) --rm -t seastar-httpd:vlad -f ./seastar-httpd/httpd/Dockerfile .
 
 httpd-init-image:
 	@echo ""

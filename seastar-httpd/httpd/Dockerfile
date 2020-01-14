@@ -32,14 +32,12 @@ RUN git fetch max
 
 # Get the patched version of DPDK, sub-module to Seastar
 WORKDIR /root/src/seastar/dpdk
-RUN git remote add max https://gitlab.com/mcoquelin/dpdk-next-virtio.git
-RUN git fetch max
+RUN git remote add vlad https://github.com/vladzcloudius/seastar.git
+RUN git fetch vlad
 
 # Change branches of Seastar
 WORKDIR /root/src/seastar
-RUN git checkout max/kubecon_poc_timer_workaround
-# Lock down code to commit on 11/15/2019
-RUN git checkout 7a454cc105dc24a97fa06b10124cf3850d77d4e9
+RUN git checkout vlad/max_kubecon_poc_timer_workaround-1
 
 # Change branches of DPDK
 WORKDIR /root/src/seastar/dpdk
