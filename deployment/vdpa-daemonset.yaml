@@ -4,18 +4,18 @@ metadata:
   name: vdpa-daemon-amd64
   labels:
     tier: node
-    app: vdpadpdk
-    name: vdpadpdk
+    app:  uvdpad
+    name: uvdpad
 spec:
   selector:
     matchLabels:
-      name: vdpadpdk
+      name: uvdpad
   template:
     metadata:
       labels:
         tier: node
-        app: vdpadpdk
-        name: vdpadpdk
+        app:  uvdpad
+        name: uvdpad
     spec:
       nodeSelector:
         beta.kubernetes.io/arch: amd64
@@ -33,7 +33,7 @@ spec:
           privileged: true
         volumeMounts:
         - name: vhostsock
-          mountPath: /var/run/vdpa/
+          mountPath: /var/run/uvdpa/
           readOnly: false
         - name: log
           mountPath: /var/log
@@ -45,25 +45,10 @@ spec:
           limits:
             hugepages-2Mi: 2048Mi
         #command: ["sleep", "infinity"]
-      - name: vdpa-grpc-server
-        image: vdpa-grpc-server:latest
-        imagePullPolicy: Never
-        startupProbe:
-          failureThreshold: 30
-          periodSeconds: 10
-        securityContext:
-          privileged: true
-        volumeMounts:
-          - name: vhostsock
-            mountPath: /var/run/vdpa/
-            readOnly: false
-          - name: log
-            mountPath: /var/log
-        #command: ["sleep", "infinity"]
       volumes:
         - name: vhostsock
           hostPath:
-            path: /var/run/vdpa/
+            path: /var/run/uvdpa/
         - name: log
           hostPath:
             path: /var/log

@@ -148,7 +148,7 @@ client-image:
 vdpa-image:
 	@echo ""
 	@echo "Making vdpa-image $(NO_CACHE) ..."
-	@docker build $(NO_CACHE) --rm -t vdpa-daemonset -f ./vdpa-dpdk-image/Dockerfile .
+	@cd vdpa-dpdk-image && docker build $(NO_CACHE) --rm -t vdpa-daemonset  .
 
 httpd-image:
 	@echo ""
