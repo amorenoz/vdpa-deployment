@@ -97,13 +97,7 @@ endif
 		pushd gopath/src/ > /dev/null; \
 		go get $(REPO_PATH_CNI) 2>&1 > /tmp/sriov-cni.log || echo "Can ignore no GO files."; \
 		popd > /dev/null; \
-		echo "Patching $(REPO_PATH_CNI)"; \
-		cp sriov-cni/* gopath/src/$(REPO_PATH_CNI)/.; \
 		pushd gopath/src/$(REPO_PATH_CNI)/ > /dev/null; \
-		mkdir -p pkg/vdpa/; \
-		mv vdpadpdk-client.go pkg/vdpa/.; \
-		mv vdpa.go pkg/vdpa/.; \
-		patch -p1 < vdpa_cni_0001.patch; \
 		echo "Glide Update"; \
 		glide update --strip-vendor; \
 		echo "Build CNI binary"; \
@@ -199,16 +193,13 @@ endif
 		echo ""; \
 		echo "Making sriov-dp ..."; \
 		echo "Downloading $(REPO_PATH_DP)"; \
-		mkdir -p gopath/src/$(ORG_PATH); \
-		pushd gopath/src/ > /dev/null; \
-		go get $(REPO_PATH_DP) 2>&1 > /tmp/sriov-dp.log || echo "Can ignore no GO files."; \
+		mkdir -p gopath/src/github.com/amorenoz; \
+		pushd gopath/src/github.com/amorenoz > /dev/null; \
+		git clone https://github.com/amorenoz/sriov-network-device-plugin.git; \
 		popd > /dev/null; \
-		echo "Patching $(REPO_PATH_DP)"; \
-		cp sriov-dp/* gopath/src/$(REPO_PATH_DP)/.; \
-		pushd gopath/src/$(REPO_PATH_DP)/ > /dev/null; \
-		git checkout bf28fdc3e2d9dd2edcc4f0bceb58448ac9317696; \
-		patch -p1 < vdpa_dp_0001.patch; \
-		patch -p1 < vdpa_dp_0002.patch; \
+		pushd gopath/src/github.com/amorenoz/sriov-network-device-plugin > /dev/null; \
+		echo "Checking out vpda branch"; \
+		git fetch -a && git checkout pooldev_vdpa; \
 		echo "Build binary"; \
 		make; \
 		echo "Build docker image \"sriov-device-plugin\""; \
