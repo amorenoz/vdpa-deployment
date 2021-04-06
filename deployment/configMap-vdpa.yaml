@@ -17,6 +17,7 @@ data:
             },
             {
                 "resourceName": "vdpa_mlx_vhost",
+                "resourcePrefix": "mellanox.com",
                 "selectors": {
                     "vendors": ["15b3"],
                     "devices": ["101e"],
@@ -25,7 +26,18 @@ data:
                 }
             },
             {
+                "resourceName": "ctx6_vf",
+                "resourcePrefix": "mellanox.com",
+                "selectors": {
+                    "vendors": ["15b3"],
+                    "devices": ["101e"],
+                    "drivers": ["mlx5_core"],
+                    "isRdma": true
+                }
+            },
+            {
                 "resourceName": "vdpa_mlx_virtio",
+                "resourcePrefix": "mellanox.com",
                 "selectors": {
                     "vendors": ["15b3"],
                     "devices": ["101e"],
