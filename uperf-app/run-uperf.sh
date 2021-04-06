@@ -13,13 +13,14 @@ if [[ $UPERF_MODE == "server" ]] ; then
     ip add add 192.168.1.1/30 dev net1
     exec uperf -sv
 elif [[ $UPERF_MODE == "client" ]] ; then
-    ip add add 192.168.1.2/30 dev net1
+    ip add add 192.168.1.2/30 dev net1 || true
     export nthr
     export proto
     export psz
     export h=192.168.1.1
     echo "PROTOCOL ${proto} Threads: ${nthr} Packet Size: ${psz} Available CPUs $(nproc)"
-    exec uperf -a -m /root/iperf.xml
+    uperf -a -m /root/iperf.xml
+    exec sleep infinity
 else
    echo "Unknown uperf mode: $@. Only supported [server, client]"
    exit 1
