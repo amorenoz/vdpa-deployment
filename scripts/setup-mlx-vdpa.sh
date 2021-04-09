@@ -1,26 +1,13 @@
 #!/bin/bash
 set -eu
- 
+
+. common.sh
+
 function usage() {
         echo "$0 PCIADDR [NUM_VFs]"
         echo "  PCIADDR: The PCI address of the PF, e.g: 0000:40:00.0"
         echo "  NUM_VFS (defaul = 4): Number of VFs to configure"
         exit 1
-}
-
-function error() {
-        echo $@
-        exit 1
-}
-
-function get_pci_addr() {
-        pf=$1
-        vf=$2
-        if [ -z $vf ]; then
-                echo $(basename $(readlink /sys/class/net/${pf}/device))
-        else
-                echo $(basename $(readlink /sys/class/net/${pf}/device/virtfn${vf}))
-        fi
 }
 
 # $1 is the vdpa device
