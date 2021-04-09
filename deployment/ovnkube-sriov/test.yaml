@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example
+  annotations:
+    v1.multus-cni.io/default-network: default-ovnkube-sriov
+spec:
+  containers:
+    - name: test
+      image: praqma/network-multitool
+      imagePullPolicy: Never
+      command:
+        - sleep
+        - infinity
+      resources:
+        requests:
+          mellanox.com/ctx6_vf: '1'
+        limits:
+          mellanox.com/ctx6_vf: '1'
