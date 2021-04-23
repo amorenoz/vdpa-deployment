@@ -1,5 +1,9 @@
 GOBIN=${PWD}/bin
 
+ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+SCRIPT_DIR := $(ROOT_DIR)/scripts
+
+
 SCRATCH?=n
 NO_CACHE?=
 ifeq ($(SCRATCH),y)
@@ -9,6 +13,7 @@ endif
 # Default to build
 .PHONY: all
 all: sriov-dp sriov-cni multus dpdk-centos
+
 
 help:
 	@echo "Make Targets:"
@@ -200,6 +205,51 @@ multus:
 		popd > /dev/null; \
 	fi
 
+REPO_PATH_OVNK8S=github.com/ovn-org/ovn-kubernetes
+ALT_OVNK8S_REPO=https://github.com/amorenoz/ovn-kubernetes.git
+ALT_OVNK8S_REF=vdpa
+.PHONY: clean-ovn-k8s
+clean-ovn-k8s:
+	@if [ -d gopath/src/$(REPO_PATH_OVNK8S) ]; then \
+	    rm -fr gopath/src/$(REPO_PATH_OVNK8S); \
+	fi \
+
+.PHONY: ovn-k8s
+ifeq ($(SCRATCH),y)
+ovn-k8s: clean-ovn-k8s
+endif
+ovn-k8s: export GOPATH=${PWD}/gopath
+ovn-k8s:
+	@if [ ! -d gopath/src/$(REPO_PATH_OVNK8S) ]; then \
+		echo ""; \
+		echo "Making ovn-k8s ..."; \
+		echo "Downloading $(REPO_PATH_OVNK8S)"; \
+		mkdir -p gopath/src/github.com/ovn-org; \
+		pushd gopath/src/ > /dev/null; \
+		go get $(REPO_PATH_OVNK8S) 2>&1 > /dev/null || echo "Can ignore no GO files."; \
+		popd > /dev/null; \
+		if [ -n "$(ALT_OVNK8S_REPO)" ];  then \
+		    pushd gopath/src/$(REPO_PATH_OVNK8S) > /dev/null; \
+		    git remote add alt $(ALT_OVNK8S_REPO) && git fetch alt; \
+		    if [ -n "$(ALT_OVNK8S_REF)" ]; then  \
+			git checkout alt/$(ALT_OVNK8S_REF) -b alt; \
+		    fi; \
+		    popd > /dev/null; \
+		fi; \
+		pushd gopath/src/$(REPO_PATH_OVNK8S) > /dev/null; \
+		    echo "Building OVNK8S"; \
+		    pushd go-controller; \
+		      make; \
+		    popd > /dev/null; \
+		    pushd dist/images; \
+		      find ../../go-controller/_output/go/bin -maxdepth 1 -type f -exec cp -f {} . \; ; \
+		      echo "ref: $(git rev-parse  --symbolic-full-name HEAD)  commit: $(git rev-parse  HEAD)" > git_info; \
+		      docker build -t ovn-daemonset-f:dev -f Dockerfile.fedora . ; \
+		    popd > /dev/null ;\
+		popd > /dev/null; \
+	fi
+
+
 .PHONY: clean
 clean: clean-sriov-dp clean-sriov-cni clean-multus
 	@export GOPATH=${PWD}/gopath && go clean --modcache
@@ -231,6 +281,7 @@ deploy:
 		kubectl delete -f deployment/$${f} 2>/dev/null || true;\
 		kubectl apply -f deployment/$${f};\
 	done;\
+	OVN_ROOT=gopath/src/${REPO_PATH_OVNK8S} OVN_IMAGE=ovn-daemonset-f:dev $(SCRIPT_DIR)/ovnk8s.sh create; \
 
 .PHONY: show
 show:

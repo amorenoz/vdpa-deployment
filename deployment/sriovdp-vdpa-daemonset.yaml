@@ -37,8 +37,8 @@ spec:
       serviceAccountName: sriov-device-plugin
       containers:
       - name: kube-sriovdp
-        image: nfvpe/sriov-device-plugin:latest
         imagePullPolicy: Never
+        image: sriov-device-plugin:vdpa
         args:
         - --log-dir=sriovdp
         - --log-level=10

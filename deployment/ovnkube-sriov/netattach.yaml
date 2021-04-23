@@ -7,4 +7,24 @@ metadata:
     k8s.v1.cni.cncf.io/resourceName: mellanox.com/ctx6_vf
 spec:
   config: '{"cniVersion":"0.3.1","name":"ovn-kubernetes","type":"ovn-k8s-cni-overlay","ipam":{},"dns":{}}'
+---
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: default-ovnkube-sriov-vdpa-virtio
+  namespace: kube-system
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: mellanox.com/ctx6_vf_vdpa_virtio
+spec:
+  config: '{"cniVersion":"0.3.1","name":"ovn-kubernetes","type":"ovn-k8s-cni-overlay","ipam":{},"dns":{}}'
+---
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: default-ovnkube-sriov-vdpa-vhost
+  namespace: kube-system
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: mellanox.com/ctx6_vf_vdpa_vhost
+spec:
+  config: '{"cniVersion":"0.3.1","name":"ovn-kubernetes","type":"ovn-k8s-cni-overlay","ipam":{},"dns":{}}'
 

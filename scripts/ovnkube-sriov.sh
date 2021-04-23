@@ -4,6 +4,7 @@
 set -exuo pipefail
 
 SCRIPT=`realpath -s $0`
+VDPA=${VDPA:-no}
 SCRIPTPATH=`dirname $SCRIPT`
 MANIFESTS_DIR=${SCRIPTPATH}/../deployment/ovnkube-sriov
 . $SCRIPTPATH/common.sh
@@ -25,7 +26,12 @@ deploy_multus() {
 
 deploy_deviceplugin() {
   echo 'Deploying DevicePlugin'
-  _kubectl create -f $MANIFESTS_DIR/configMap.yaml
+   if [ "${VDPA} " != "no" ]; then
+  	_kubectl create -f $MANIFESTS_DIR/configMap-vdpa.yaml
+   else
+  	_kubectl create -f $MANIFESTS_DIR/configMap.yaml
+   fi
+
   _kubectl create -f $MANIFESTS_DIR/sriov_device_plugin.yaml
 
   echo 'Waiting for DevicePlugin deployment to become ready'
@@ -52,7 +58,7 @@ setup_sriov() {
 	set_eswitch_mode $pf switchdev
 	# Just in case, if NetworkManager is running, tell it not to handle the PF (or it will mess the qdiscs)
         sleep 5
-	nmcli device set $pf managed no
+	nmcli device set $pf managed no || true
 	set_tc_offload ${pf}
 
         for i in $(seq 0 $(($NUM_VFS -1))); do
@@ -63,7 +69,7 @@ setup_sriov() {
             devname=$(ls -x /sys/class/net/${pf}/device/virtfn${i}/net)
             [ -z "$devname" ] && error "Cannot get VF network device"
             set_tc_offload ${devname}
-            nmcli device set ${devname} managed no
+            nmcli device set ${devname} managed no || true
         done
 
         for i in $(seq 0 $(($NUM_VFS -1))); do
@@ -71,9 +77,26 @@ setup_sriov() {
             rep=$(get_representor ${pf} $i)
             echo "Configuring ${devname} (rep: ${rep} )"
             set_tc_offload ${rep}
-            nmcli device set ${rep} managed no
+            nmcli device set ${rep} managed no || true
             sudo ip link set ${rep} up
         done
+	sudo ip link set ${pf} up
+}
+
+# $1 is the vdpa device
+# $2 is the desired vdpa driver
+set_vdpa_driver() {
+        local dev=$1
+        local driver=$2
+            if [ -d "/sys/bus/vdpa/devices/${dev}/driver" ]; then
+                    local curr_driver=$(basename $(readlink /sys/bus/vdpa/devices/${dev}/driver))
+                    if [[ "${curr_driver}" != "${driver}" ]]; then
+                        echo "${dev}" | sudo tee /sys/bus/vdpa/drivers/${curr_driver}/unbind
+                else 
+                        return 0
+                fi
+        fi
+        echo "${dev}" | sudo tee /sys/bus/vdpa/drivers/${driver}/bind
 }
 
 usage(){
@@ -92,7 +115,32 @@ do_start() {
 
     echo "PFNAME: $pf"
 
+    if [ "${VDPA} " != "no" ]; then
+	    sudo modprobe vdpa || true
+	    sudo modprobe virtio-vdpa || true
+	    sudo modprobe vhost-vdpa || true
+	    sudo modprobe mlx5-vdpa || true
+    else
+	    sudo modprobe -r mlx5-vdpa || true
+	    sudo modprobe -r vhost-vdpa || true
+	    sudo modprobe -r virtio-vdpa || true
+	    sudo modprobe -r vdpa || true
+    fi
+
     setup_sriov $pf
+
+    if [ "${VDPA} " != "no" ]; then
+	echo ""
+	echo "Binding half of the devices to vhost-vdpa and other half to virtio-vpda"
+	DRIVERS=("vhost_vdpa" "virtio_vdpa")
+	devices=( $(ls -x /sys/bus/vdpa/devices) )
+	for i in ${!devices[@]}; do
+	    dev=${devices[$i]}
+	    driver=${DRIVERS[$(($i%2))]}
+	    echo "Binding device ${dev} to driver ${driver}"
+	    set_vdpa_driver $dev $driver
+	done
+    fi
 
     deploy_multus 
 
@@ -117,10 +165,11 @@ do_start() {
 }
 
 do_stop() {
-  	_kubectl delete -f $MANIFESTS_DIR/configMap.yaml
-  	_kubectl delete -f $MANIFESTS_DIR/sriov_device_plugin.yaml
-  	_kubectl delete -f $MANIFESTS_DIR/netattach.yaml
-  	_kubectl delete -f $MANIFESTS_DIR/multus.yaml
+  	_kubectl delete -f $MANIFESTS_DIR/configMap.yaml || true
+  	_kubectl delete -f $MANIFESTS_DIR/configMap-vdpa.yaml || true
+  	_kubectl delete -f $MANIFESTS_DIR/sriov_device_plugin.yaml || true
+  	_kubectl delete -f $MANIFESTS_DIR/netattach.yaml || true
+  	_kubectl delete -f $MANIFESTS_DIR/multus.yaml || true
 }
 
 # Main program

@@ -1,0 +1,103 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-vhost-1
+  annotations:
+  annotations:
+    v1.multus-cni.io/default-network: default-ovnkube-sriov-vdpa-vhost
+spec:
+  containers:
+  - name: vdpa-dpd-app
+    image: dpdk-app-devel:latest
+    imagePullPolicy: Never
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /etc/podnetinfo
+      name: podnetinfo
+      readOnly: false
+    - mountPath: /dev/hugepages
+      name: hugepage
+    resources:
+      requests:
+        memory: 1Gi
+        #memory: 2Mi
+        mellanox.com/ctx6_vf_vdpa_vhost: '1'
+      limits:
+        hugepages-1Gi: 2Gi
+        #hugepages-2Mi: 2048Mi
+        mellanox.com/ctx6_vf_vdpa_vhost: '1'
+    # Uncomment for debugging :
+    command: ["sleep"]
+    args: ["infinity"]
+      #env:
+      #  - name: DPDK_SAMPLE_APP
+      #    value: "testpmd"
+      #  - name: TESTPMD_EXTRA_ARGS
+      #    value: "--forward-mode=txonly --eth-peer 0,0C:FE:C0:FF:EE:10 --eth-peer 1,0C:FE:C0:FF:EE:11"
+  volumes:
+  - name: podnetinfo
+    downwardAPI:
+      items:
+        - path: "labels"
+          fieldRef:
+            fieldPath: metadata.labels
+        - path: "annotations"
+          fieldRef:
+            fieldPath: metadata.annotations
+  - name: hugepage
+    emptyDir:
+      medium: HugePages
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-vhost-2
+  annotations:
+  annotations:
+    v1.multus-cni.io/default-network: default-ovnkube-sriov-vdpa-vhost
+spec:
+  containers:
+  - name: vdpa-dpd-app
+    image: dpdk-app-devel:latest
+    imagePullPolicy: Never
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /etc/podnetinfo
+      name: podnetinfo
+      readOnly: false
+    - mountPath: /dev/hugepages
+      name: hugepage
+    resources:
+      requests:
+        memory: 1Gi
+        #memory: 2Mi
+        mellanox.com/ctx6_vf_vdpa_vhost: '1'
+      limits:
+        hugepages-1Gi: 2Gi
+        #hugepages-2Mi: 2048Mi
+        mellanox.com/ctx6_vf_vdpa_vhost: '1'
+    # Uncomment for debugging :
+    command: ["sleep"]
+    args: ["infinity"]
+      #env:
+      #  - name: DPDK_SAMPLE_APP
+      #    value: "testpmd"
+      #  - name: TESTPMD_EXTRA_ARGS
+      #    value: "--forward-mode=txonly --eth-peer 0,0C:FE:C0:FF:EE:10 --eth-peer 1,0C:FE:C0:FF:EE:11"
+  volumes:
+  - name: podnetinfo
+    downwardAPI:
+      items:
+        - path: "labels"
+          fieldRef:
+            fieldPath: metadata.labels
+        - path: "annotations"
+          fieldRef:
+            fieldPath: metadata.annotations
+  - name: hugepage
+    emptyDir:
+      medium: HugePages

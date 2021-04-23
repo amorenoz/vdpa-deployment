@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sriovdp-config
+  namespace: kube-system
+data:
+  config.json: |
+    {
+        "resourceList": [{
+                "resourceName": "vdpa_ifcvf_vhost",
+                "selectors": {
+                    "vendors": ["1af4"],
+                    "devices": ["1041"],
+                    "drivers": ["ifcvf"],
+                    "vdpaType": "vhost"
+                }
+            },
+            {
+                "resourceName": "ctx6_vf_vdpa_vhost",
+                "resourcePrefix": "mellanox.com",
+                "selectors": {
+                    "vendors": ["15b3"],
+                    "devices": ["101e"],
+                    "drivers": ["mlx5_core"],
+                    "vdpaType": "vhost"
+                }
+            },
+            {
+                "resourceName": "ctx6_vf",
+                "resourcePrefix": "mellanox.com",
+                "selectors": {
+                    "vendors": ["15b3"],
+                    "devices": ["101e"],
+                    "drivers": ["mlx5_core"],
+                    "isRdma": true
+                }
+            },
+            {
+                "resourceName": "ctx6_vf_vdpa_virtio",
+                "resourcePrefix": "mellanox.com",
+                "selectors": {
+                    "vendors": ["15b3"],
+                    "devices": ["101e"],
+                    "drivers": ["mlx5_core"],
+                    "vdpaType": "virtio"
+                }
+            }
+        ]
+    }
+

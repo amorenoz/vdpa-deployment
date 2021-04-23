@@ -35,9 +35,12 @@ fi
 
 PCI_ADDR=$1
 NUM_VFS=${2:-4}
- 
+
+ulimit -l unlimited
+
 echo "Creating VFs" 
 PF=$(ls -x /sys/bus/pci/devices/${PCI_ADDR}/net/)
+echo $PF
 echo 0 > /sys/class/net/${PF}/device/sriov_numvfs
 PF=$(ls -x /sys/bus/pci/devices/${PCI_ADDR}/net/)
 echo 4 > /sys/class/net/${PF}/device/sriov_numvfs
@@ -68,6 +71,7 @@ done
 
 # Try to modprobe vhost_vdpa just in case
 modprobe vhost_vdpa || true
+modprobe virtio_vdpa || true
 
 echo ""
 echo "Binding half of the devices to vhost-vdpa and other half to virtio-vpda"

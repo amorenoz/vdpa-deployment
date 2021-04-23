@@ -50,7 +50,7 @@ spec:
       - name: DPDK_SAMPLE_APP
         value: "testpmd"
       - name: TESTPMD_EXTRA_ARGS
-        value: "--forward-mode=txonly"
+        value: "--forward-mode=txonly --eth-peer 0,0C:FE:C0:FF:EE:10 --eth-peer 1,0C:FE:C0:FF:EE:11"
   volumes:
   - name: podnetinfo
     downwardAPI:

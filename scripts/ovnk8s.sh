@@ -164,14 +164,14 @@ start_ovs() {
 				sudo rm /etc/openvswitch/conf.db
 			fi
 		fi
-		sudo /usr/local/share/openvswitch/scripts/ovs-ctl --system-id=random --delete-bridges --no-ovs-vswitchd start
+		sudo systemctl start openvswitch
     		sudo ovs-vsctl --no-wait set Open_vSwitch . other_config:hw-offload="true"
-    		sudo /usr/local/share/openvswitch/scripts/ovs-ctl --sytem-id=random --no-ovsdb-server start
+		sudo systemctl restart openvswitch
 	fi
 }
 
 stop_ovs() {
-	sudo /usr/share/openvswitch/scripts/ovs-ctl stop || true
+	sudo systemctl stop openvswitch || true
 	sudo ovs-dpctl del-dp ovs-system || true
 	sudo rmmod openvswitch || true
 }
@@ -217,7 +217,7 @@ do_stop() {
   	kubectl delete -f ovnkube-node.yaml --wait || true
   	kubectl delete -f ovnkube-master.yaml --wait || true
     	kubectl delete -f ovnkube-db.yaml --wait || true
-	kubectl apply -f ${SCRIPTPATH}/cleaner.yaml
+	kubectl apply -f ${SCRIPTPATH}/cleaner.yaml || true
 	sleep 10
 	kubectl get pods -A
 	sleep 5
@@ -232,10 +232,7 @@ do_stop() {
   popd
   #kubectl delete namespace ovn-kubernetes || true
   stop_ovs
-  sudo systemctl restart NetworkManager 
   sleep 10
-  sudo nmcli con down System\ eno1
-  sudo nmcli con up System\ eno1
 }
 
 CMD=${1:-usage}
